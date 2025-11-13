@@ -1,20 +1,27 @@
+// src/components/Navbar.jsx
 import React, { useEffect, useState } from "react";
 import { FiSearch, FiUser } from "react-icons/fi";
-import { motion } from "framer-motion";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { motion, useAnimation } from "framer-motion";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setSearchTerm } from "../features/search/searchSlice";
 
 const Navbar = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const navigate = useNavigate();
+  const controls = useAnimation();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    controls.start({ height: isScrolled ? 64 : 88, transition: { duration: 0.35 } });
+  }, [isScrolled, controls]);
 
   const navLinks = [
     { path: "/movies", label: "Movies" },
@@ -24,42 +31,28 @@ const Navbar = () => {
 
   return (
     <motion.nav
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-        isScrolled
-          ? "bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-100"
-          : "bg-transparent backdrop-blur-md"
+      animate={controls}
+      initial={{ height: 88 }}
+      className={`fixed top-0 left-0 w-full z-50 transition-all ${
+        isScrolled ? "backdrop-blur-lg bg-white/60 shadow-sm border-b border-gray-100" : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between">
-
-        {/* 🔥 Logo */}
+      <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-full">
         <h1
           onClick={() => navigate("/")}
-          className="text-[24px] sm:text-[26px] font-extrabold 
-          bg-gradient-to-r from-[#8A3FFC] to-[#FF6A88]
-          text-transparent bg-clip-text cursor-pointer"
+          className={`text-[26px] font-extrabold bg-gradient-to-r from-[#8A3FFC] to-[#FF6A88] text-transparent bg-clip-text cursor-pointer tracking-tight transition-all ${isScrolled ? "text-[22px]" : "text-[26px]"}`}
         >
           District
         </h1>
 
-        {/* 🌐 Navigation + Search */}
-        <div className="flex items-center justify-center space-x-6 sm:space-x-10 flex-1 ml-5 hidden md:flex">
-
-          {/* Nav Links */}
-          <ul className="flex items-center space-x-8 text-[15px] font-medium">
+        <div className="flex items-center flex-1 justify-center space-x-8">
+          <ul className="hidden md:flex items-center space-x-8 font-medium">
             {navLinks.map(({ path, label }) => (
               <li key={path}>
                 <NavLink
                   to={path}
                   className={({ isActive }) =>
-                    `relative transition-all ${
-                      isActive
-                        ? "text-[#8A3FFC] font-semibold after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-full after:bg-[#8A3FFC] after:rounded-full"
-                        : "text-gray-700 hover:text-[#8A3FFC]"
-                    }`
+                    `relative pb-1 transition-all ${isActive ? "text-[#8A3FFC] font-semibold after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-full after:bg-[#8A3FFC] after:rounded-full" : "text-gray-700 hover:text-[#8A3FFC]"}`
                   }
                 >
                   {label}
@@ -68,39 +61,24 @@ const Navbar = () => {
             ))}
           </ul>
 
-          {/* Search Bar */}
-          <div className="flex items-center bg-white border border-gray-200 rounded-full 
-          px-4 py-2 w-[240px] lg:w-[300px] shadow-sm focus-within:ring-2 focus-within:ring-[#8A3FFC]/40">
+          <div className="hidden md:flex items-center bg-white border border-gray-200 rounded-full px-4 py-2 w-[360px] shadow-sm transition-all duration-300">
             <input
               type="text"
-              placeholder="Search..."
-              className="w-full bg-transparent outline-none text-[14px]"
+              placeholder="Search for movies, events..."
+              className="w-full bg-transparent focus:outline-none text-gray-700 placeholder-gray-400 text-[15px]"
               onChange={(e) => dispatch(setSearchTerm(e.target.value))}
             />
-            <FiSearch className="text-[#8A3FFC]" size={18} />
+            <FiSearch className="text-[#8A3FFC] text-lg ml-2" />
           </div>
-
         </div>
 
-        {/* 👤 Auth Buttons */}
-        <div className="flex items-center space-x-5">
-
-          <Link
-            to="/login"
-            className="flex items-center gap-2 text-gray-700 hover:text-[#8A3FFC] text-[15px] transition"
-          >
-            <FiUser size={18} /> Login
+        <div className="flex items-center space-x-4">
+          <Link to="/login" className="flex items-center gap-2 text-gray-700 hover:text-[#8A3FFC]">
+            <FiUser className="text-[18px]" /> Login
           </Link>
-
-          <Link
-            to="/signup"
-            className="bg-gradient-to-r from-[#8A3FFC] to-[#FF6A88] text-white 
-            px-5 py-2 rounded-full font-medium text-[15px] shadow-md 
-            hover:scale-105 transition"
-          >
+          <Link to="/signup" className="bg-gradient-to-r from-[#8A3FFC] to-[#FF6A88] text-white px-4 py-2 rounded-full font-medium shadow-md hover:scale-105 transition-all">
             Sign Up
           </Link>
-
         </div>
       </div>
     </motion.nav>

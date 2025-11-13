@@ -27,3 +27,14 @@ body {
   transition: all 0.25s ease-out;
   scroll-behavior: smooth;
 }
+
+/* index.css additions */
+:root{
+  --glass-border: rgba(255,255,255,0.5);
+}
+
+.bg-clip-text { -webkit-background-clip: text; background-clip: text; }
+.rounded-3xl { border-radius: 1.25rem; }
+.shadow-2xl { box-shadow: 0 20px 40px rgba(15,15,25,0.08); }
+.backdrop-blur-lg { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
