@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+:root {
+  --primary: #E23744;
+  --accent: #F6B544;
+  --bg: #FAFAFA;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg);
+  color: #1a1a1a;
+}
+
+/* Simple global transitions */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+* {
+  transition: all 0.25s ease-out;
+  scroll-behavior: smooth;
+}
