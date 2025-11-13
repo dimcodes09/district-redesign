@@ -10,20 +10,28 @@ const CategorySection = ({ sectionTitle }) => {
   const [filters, setFilters] = useState({});
 
   const movies = useSelector((state) => state.movies.list || []);
-  const searchTerm = useSelector((state) => state.search?.term?.toLowerCase() || "");
+  const searchTerm = useSelector(
+    (state) => state.search?.term?.toLowerCase() || ""
+  );
 
   if (!movies.length) return null;
 
   const applyFilters = (movie) => {
+    // Search
     if (searchTerm && !movie.title.toLowerCase().includes(searchTerm)) return false;
-    if (filters.genre && movie.genre?.toLowerCase() !== filters.genre) return false;
-    if (filters.location && movie.location?.toLowerCase() !== filters.location)
-      return false;
 
+    // Genre filter
+    if (filters.genre && movie.genre !== filters.genre) return false;
+
+    // Location filter
+    if (filters.location && movie.location !== filters.location) return false;
+
+    // Price
     if (filters.price) {
       const [min, max] = filters.price.split("-").map(Number);
-      const priceValue = parseInt(movie.price.replace(/[₹^\s]/g, ""));
-      if (priceValue < min || priceValue > max) return false;
+      const moviePrice = Number(movie.price);
+
+      if (moviePrice < min || moviePrice > max) return false;
     }
 
     return true;
@@ -32,7 +40,7 @@ const CategorySection = ({ sectionTitle }) => {
   return (
     <section
       id="movies"
-      className="px-6 md:px-10 py-16 bg-gradient-to-b from-gray-50 to-purple-50 transition-all duration-300"
+      className="px-6 md:px-10 py-16 bg-gradient-to-b from-gray-50 to-purple-50"
     >
       <FilterBar onFilterChange={setFilters} />
 
@@ -40,13 +48,15 @@ const CategorySection = ({ sectionTitle }) => {
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
           {sectionTitle}
         </h2>
+
         <div className="h-1 w-24 bg-gradient-to-r from-pink-500 via-orange-400 to-yellow-400 mx-auto rounded-full"></div>
+
         <p className="text-gray-600 mt-2 text-sm">
           Catch the latest blockbusters playing near you 🎥
         </p>
       </div>
 
-      {/* MOVIE GRID */}
+      {/* GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-items-center">
         {movies.filter(applyFilters).map((movie, index) => (
           <motion.div
@@ -66,7 +76,6 @@ const CategorySection = ({ sectionTitle }) => {
               src={movie.image}
               alt={movie.title}
               className="w-full h-48 object-cover"
-              loading="lazy"
             />
 
             <div className="p-4 text-center">
@@ -79,7 +88,7 @@ const CategorySection = ({ sectionTitle }) => {
               <button
                 onClick={() => {
                   showToast("🎟️ Redirecting to details page...");
-                  navigate(`/details/movies/${movie.id ?? encodeURIComponent(movie.title)}`);
+                  navigate(`/details/movies/${movie.id}`);
                 }}
                 className="mt-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-2 rounded-lg text-sm hover:scale-105 transition-transform"
               >
